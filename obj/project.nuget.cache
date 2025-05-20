@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "W7pP1ciTPQfbDQ4zC5nz0G0oGKu8C9JN+nDp23Uq0Q31tz4PItFzu1YzM5mlYK8pMX/fnqvHXqZSdLxS0/0YhQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\123\\source\\repos\\7zSharpArchiver\\7zSharpArchiver\\7zSharpArchiver.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\123\\.nuget\\packages\\sharpsevenzip\\2.0.22\\sharpsevenzip.2.0.22.nupkg.sha512"
+  ],
+  "logs": []
+}

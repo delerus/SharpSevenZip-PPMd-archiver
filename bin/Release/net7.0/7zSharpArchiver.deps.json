@@ -1,0 +1,41 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "7zSharpArchiver/1.0.0": {
+        "dependencies": {
+          "SharpSevenZip": "2.0.22"
+        },
+        "runtime": {
+          "7zSharpArchiver.dll": {}
+        }
+      },
+      "SharpSevenZip/2.0.22": {
+        "runtime": {
+          "lib/net6.0/SharpSevenZip.dll": {
+            "assemblyVersion": "2.0.22.0",
+            "fileVersion": "2.0.22.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "7zSharpArchiver/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SharpSevenZip/2.0.22": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-MCF9U6ORedeabWtkaI/aFb8sBwjboue6NRJXb8ZuZKH095G3yjImxe4i2WeAmx8EiE6iCUF9MR4wUM+qEFdeLg==",
+      "path": "sharpsevenzip/2.0.22",
+      "hashPath": "sharpsevenzip.2.0.22.nupkg.sha512"
+    }
+  }
+}

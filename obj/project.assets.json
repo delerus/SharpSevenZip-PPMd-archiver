@@ -1,0 +1,118 @@
+{
+  "version": 3,
+  "targets": {
+    "net7.0": {
+      "SharpSevenZip/2.0.22": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/SharpSevenZip.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/SharpSevenZip.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/SharpSevenZip.targets": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SharpSevenZip/2.0.22": {
+      "sha512": "MCF9U6ORedeabWtkaI/aFb8sBwjboue6NRJXb8ZuZKH095G3yjImxe4i2WeAmx8EiE6iCUF9MR4wUM+qEFdeLg==",
+      "type": "package",
+      "path": "sharpsevenzip/2.0.22",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "build/SharpSevenZip.targets",
+        "build/x64/7z.dll",
+        "build/x86/7z.dll",
+        "lib/net48/SharpSevenZip.dll",
+        "lib/net48/SharpSevenZip.xml",
+        "lib/net6.0/SharpSevenZip.dll",
+        "lib/net6.0/SharpSevenZip.xml",
+        "lib/net8.0/SharpSevenZip.dll",
+        "lib/net8.0/SharpSevenZip.xml",
+        "lib/netstandard2.0/SharpSevenZip.dll",
+        "lib/netstandard2.0/SharpSevenZip.xml",
+        "sharpsevenzip.2.0.22.nupkg.sha512",
+        "sharpsevenzip.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net7.0": [
+      "SharpSevenZip >= 2.0.22"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\123\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\123\\source\\repos\\7zSharpArchiver\\7zSharpArchiver\\7zSharpArchiver.csproj",
+      "projectName": "7zSharpArchiver",
+      "projectPath": "C:\\Users\\123\\source\\repos\\7zSharpArchiver\\7zSharpArchiver\\7zSharpArchiver.csproj",
+      "packagesPath": "C:\\Users\\123\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\123\\source\\repos\\7zSharpArchiver\\7zSharpArchiver\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\123\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net7.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net7.0": {
+        "targetAlias": "net7.0",
+        "dependencies": {
+          "SharpSevenZip": {
+            "target": "Package",
+            "version": "[2.0.22, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

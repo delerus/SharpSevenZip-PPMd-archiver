@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "7zSharpArchiver": {
+      "commandName": "Project",
+      "commandLineArgs": "\"enwik8.7z\" \"C:\\asdf\""
+    }
+  }
+}
