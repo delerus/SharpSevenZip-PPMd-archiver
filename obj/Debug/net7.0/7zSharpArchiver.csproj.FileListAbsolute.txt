@@ -17,3 +17,4 @@ C:\Users\123\source\repos\7zSharpArchiver\7zSharpArchiver\obj\Debug\net7.0\refin
 C:\Users\123\source\repos\7zSharpArchiver\7zSharpArchiver\obj\Debug\net7.0\7zSharpArchiver.pdb
 C:\Users\123\source\repos\7zSharpArchiver\7zSharpArchiver\obj\Debug\net7.0\7zSharpArchiver.genruntimeconfig.cache
 C:\Users\123\source\repos\7zSharpArchiver\7zSharpArchiver\obj\Debug\net7.0\ref\7zSharpArchiver.dll
+C:\Users\123\source\repos\7zSharpArchiver\7zSharpArchiver\obj\Debug\net7.0\7zSharpArchiver.sourcelink.json

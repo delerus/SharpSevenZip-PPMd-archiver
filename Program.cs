@@ -10,12 +10,9 @@ namespace SevenZipSharpArchiver
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("SharpSevenZip Archiver");
-            Console.WriteLine("-------------------");
-
             if (args.Length != 2)
             {
-                Console.WriteLine("Использование: SevenZipSharpArchiver.exe 'inputFile' 'outputFile'");
+                Console.WriteLine("Usage: SevenZipSharpArchiver.exe 'inputFile' 'outputFile'");
                 Console.ReadKey();
                 return;
             }
@@ -30,10 +27,9 @@ namespace SevenZipSharpArchiver
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
-            Console.WriteLine("-------------------");
-            Console.WriteLine("Нажмите любую кнопку для выхода..");
+            Console.WriteLine("Press any button...");
             Console.ReadKey();
         }
     }
