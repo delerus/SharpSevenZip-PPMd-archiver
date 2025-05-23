@@ -4,6 +4,7 @@ using SevenZipSharpArchiver.Core.Configuration;
 using SevenZipSharpArchiver.Core.Models;
 using SevenZipSharpArchiver.Core.Logging;
 using SharpSevenZip;
+using System.Linq;
 
 namespace SevenZipSharpArchiver.Core.Compression
 {
@@ -61,6 +62,45 @@ namespace SevenZipSharpArchiver.Core.Compression
             {
                 _logger.Error($"Error compressing file {inputFilePath}", ex);
                 throw new Exception($"Error compressing file: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Compresses multiple files using PPMd algorithm
+        /// </summary>
+        /// <param name="inputFilePaths">List of input file paths</param>
+        /// <param name="outputFilePath">Output archive path</param>
+        public void CompressFiles(IEnumerable<string> inputFilePaths, string outputFilePath)
+        {
+            try
+            {
+                if (inputFilePaths == null || !inputFilePaths.Any())
+                {
+                    throw new ArgumentException("No input files provided for compression", nameof(inputFilePaths));
+                }
+
+                _logger.Debug($"Creating compressor for multiple files to {outputFilePath}");
+                
+                var compressor = _compressorFactory.CreateCompressor();
+                _logger.Debug("Configuring compressor with settings");
+                
+                // Configure compressor using settings
+                compressor = CompressorConfigurator.Configure(compressor, _settings, _compressionParams);
+                
+                _logger.Information($"Starting compression of {inputFilePaths.Count()} files to {outputFilePath}");
+                
+                // Convert the enumerable to an array for SharpSevenZip
+                string[] filesToCompress = inputFilePaths.ToArray();
+                compressor.CompressFiles(outputFilePath, filesToCompress);
+                
+                _logger.Information($"Successfully compressed {filesToCompress.Length} files to {outputFilePath}");
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Error compressing multiple files", ex);
+                throw new Exception($"Error compressing multiple files: {ex.Message}", ex);
             }
         }
     }

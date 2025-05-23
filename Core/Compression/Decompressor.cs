@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SharpSevenZip;
 using SevenZipSharpArchiver.Core.Configuration;
 using SevenZipSharpArchiver.Core.Models;
@@ -9,13 +11,11 @@ namespace SevenZipSharpArchiver.Core.Compression
     /// <summary>
     /// Decompressor implementation for archive extraction
     /// </summary>
-    public class Decompressor : IDecompressor, IDisposable
+    public class Decompressor : IDecompressor
     {
         private readonly DecompressionSettings _settings;
         private readonly ILogger _logger;
         private readonly IDecompressorFactory _decompressorFactory;
-        private SharpSevenZipExtractor _decompressor;
-        private bool _disposed = false;
 
         /// <summary>
         /// Creates a new instance of decompressor with specified settings and dependencies
@@ -43,15 +43,17 @@ namespace SevenZipSharpArchiver.Core.Compression
             try
             {
                 _logger.Debug($"Creating decompressor for {inputFilePath}");
-                _decompressor = _decompressorFactory.CreateDecompressor(inputFilePath);
+                var decompressor = _decompressorFactory.CreateDecompressor(inputFilePath);
                 
                 _logger.Debug("Configuring decompressor with settings");
                 // Configure the decompressor using settings
-                _decompressor = DecompressorConfigurator.Configure(_decompressor, _settings);
+                var configuredDecompressor = DecompressorConfigurator.Configure(decompressor, _settings);
                 
                 _logger.Information($"Starting decompression of {inputFilePath} to {outputFilePath}");
-                _decompressor.ExtractArchive(outputFilePath);
+                configuredDecompressor.ExtractArchive(outputFilePath);
                 _logger.Information($"Successfully decompressed archive to {outputFilePath}");
+                
+                decompressor.Dispose();
             }
             catch (Exception ex)
             {
@@ -61,39 +63,63 @@ namespace SevenZipSharpArchiver.Core.Compression
         }
 
         /// <summary>
-        /// Disposes the decompressor resources
+        /// Extracts specific files from an archive
         /// </summary>
-        public void Dispose()
+        /// <param name="inputFilePath">Input archive path</param>
+        /// <param name="fileNamesToExtract">List of file names to extract</param>
+        /// <param name="outputFilePath">Output directory path</param>
+        public void ExtractFiles(string inputFilePath, IEnumerable<string> fileNamesToExtract, string outputFilePath)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the decompressor resources
-        /// </summary>
-        /// <param name="disposing">True if called from Dispose(), false if from finalizer</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing && _decompressor != null)
+            try
             {
-                _logger?.Debug("Disposing decompressor resources");
-                _decompressor.Dispose();
-                _decompressor = null;
+                if (fileNamesToExtract == null || !fileNamesToExtract.Any())
+                {
+                    _logger.Warning("No specific files provided for extraction. Extracting entire archive.");
+                    DecompressFile(inputFilePath, outputFilePath);
+                    return;
+                }
+
+                _logger.Debug($"Creating decompressor for extracting specific files from {inputFilePath}");
+                var decompressor = _decompressorFactory.CreateDecompressor(inputFilePath);
+                
+                _logger.Debug("Configuring decompressor with settings");
+                // Configure the decompressor using settings
+                var configuredDecompressor = DecompressorConfigurator.Configure(decompressor, _settings);
+
+                // Get all files in the archive
+                var archiveFiles = configuredDecompressor.ArchiveFileData;
+                
+                // Find the indexes of files to extract
+                var filesToExtract = new List<int>();
+                foreach (var fileName in fileNamesToExtract)
+                {
+                    for (int i = 0; i < archiveFiles.Count; i++)
+                    {
+                        if (archiveFiles[i].FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            filesToExtract.Add(i);
+                            break;
+                        }
+                    }
+                }
+
+                if (filesToExtract.Count == 0)
+                {
+                    _logger.Warning("None of the specified files found in the archive.");
+                    return;
+                }
+
+                _logger.Information($"Starting extraction of {filesToExtract.Count} files from {inputFilePath} to {outputFilePath}");
+                configuredDecompressor.ExtractFiles(outputFilePath, filesToExtract.ToArray());
+                _logger.Information($"Successfully extracted {filesToExtract.Count} files to {outputFilePath}");
+                
+                decompressor.Dispose();
             }
-
-            _disposed = true;
-        }
-
-        /// <summary>
-        /// Destructor
-        /// </summary>
-        ~Decompressor()
-        {
-            Dispose(false);
+            catch (Exception ex)
+            {
+                _logger.Error($"Error extracting files from {inputFilePath}", ex);
+                throw new Exception($"Error extracting files: {ex.Message}", ex);
+            }
         }
     }
 }

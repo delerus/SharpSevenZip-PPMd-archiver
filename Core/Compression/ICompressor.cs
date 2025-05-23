@@ -17,5 +17,12 @@ namespace SevenZipSharpArchiver.Core.Compression
         /// <param name="inputFilePath">Input file path</param>
         /// <param name="outputFilePath">Output file path</param>
         void CompressFile(string inputFilePath, string outputFilePath);
+
+        /// <summary>
+        /// Compresses multiple files
+        /// </summary>
+        /// <param name="inputFilePaths">List of input file paths</param>
+        /// <param name="outputFilePath">Output archive path</param>
+        void CompressFiles(IEnumerable<string> inputFilePaths, string outputFilePath);
     }
 }

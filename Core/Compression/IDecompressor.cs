@@ -18,5 +18,13 @@ namespace SevenZipSharpArchiver.Core.Compression
         /// <param name="inputFilePath">Input archive path</param>
         /// <param name="outputFilePath">Output directory path</param>
         void DecompressFile(string inputFilePath, string outputFilePath);
+
+        /// <summary>
+        /// Extracts specific files from an archive
+        /// </summary>
+        /// <param name="inputFilePath">Input archive path</param>
+        /// <param name="fileNamesToExtract">List of file names to extract</param>
+        /// <param name="outputFilePath">Output directory path</param>
+        void ExtractFiles(string inputFilePath, IEnumerable<string> fileNamesToExtract, string outputFilePath);
     }
 }
