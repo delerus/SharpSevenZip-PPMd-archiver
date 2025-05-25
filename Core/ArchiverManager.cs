@@ -74,7 +74,7 @@ namespace SevenZipSharpArchiver.Core
                 _logger.Debug("Validating input files...");
                 foreach (var inputFile in _inputFilePaths)
                 {
-                    IOHandler.ValidateReadFile(inputFile);
+                    FilePathValidator.ValidateReadFile(inputFile);
                 }
 
                 _logger.Debug("Initializing 7z library...");
@@ -95,7 +95,7 @@ namespace SevenZipSharpArchiver.Core
                     {
                         _logger.Information("File is not an archive. Starting compression...");
                         _logger.Debug("Validating output file...");
-                        IOHandler.ValidateWriteFile(_outputPath);
+                        FilePathValidator.ValidateWriteFile(_outputPath);
                         Compression();
                     }
                 }
@@ -104,7 +104,7 @@ namespace SevenZipSharpArchiver.Core
                 {
                     _logger.Information($"Processing {_inputFilePaths.Count} files for compression");
                     _logger.Debug("Validating output file...");
-                    IOHandler.ValidateWriteFile(_outputPath);
+                    FilePathValidator.ValidateWriteFile(_outputPath);
                     Compression();
                 }
             }

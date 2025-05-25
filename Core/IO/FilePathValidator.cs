@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace SevenZipSharpArchiver.Core.IO
 {
-    public static class IOHandler
+    public static class FilePathValidator
     {
         public static void ValidateReadFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentException("Путь к файлу не может быть пустым");
+                throw new ArgumentException("Path to file cannot be empty");
 
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"Файл не найден: {filePath}");
+                throw new FileNotFoundException($"File not found: {filePath}");
 
             try
             {
@@ -22,14 +19,14 @@ namespace SevenZipSharpArchiver.Core.IO
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Некорректный путь: {filePath}", ex);
+                throw new ArgumentException($"Invalid path: {filePath}", ex);
             }
         }
 
         public static void ValidateWriteFile(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentException("Путь к файлу не может быть пустым");
+                throw new ArgumentException("Path to file cannot be empty");
 
             try
             {
@@ -44,13 +41,13 @@ namespace SevenZipSharpArchiver.Core.IO
                     }
                     catch
                     {
-                        throw new ArgumentException($"Не удалось создать директорию: {directory}");
+                        throw new ArgumentException($"Failed to create directory: {directory}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"Некорректный путь: {filePath}", ex);
+                throw new ArgumentException($"Invalid path: {filePath}", ex);
             }
         }
     }
