@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bea31c6814fbb58d43ca582a3682b60a70dd3eb7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c0cfa74a42967c54b41e2014acda28ed1482083")]
 [assembly: System.Reflection.AssemblyProductAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

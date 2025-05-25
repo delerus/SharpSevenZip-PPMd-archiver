@@ -1,7 +1,8 @@
 {
   "profiles": {
     "7zSharpArchiver": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "\"--profile=extreme\"\r\n\"enwik8\"\r\n\"enwik8_extreme_profile.7z\""
     }
   }
 }

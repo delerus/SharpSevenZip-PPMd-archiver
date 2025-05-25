@@ -11,6 +11,7 @@ using SevenZipSharpArchiver.Core.Configuration;
 using SevenZipSharpArchiver.Core.Logging;
 using SevenZipSharpArchiver.Core.Mappers;
 using SevenZipSharpArchiver.Core.Infrastructure;
+using SevenZipSharpArchiver.Core.Profiling;
 
 namespace SevenZipSharpArchiver.Core
 {
@@ -24,6 +25,8 @@ namespace SevenZipSharpArchiver.Core
         private ILogger _logger;
         private ICompressorFactory _compressorFactory;
         private IDecompressorFactory _decompressorFactory;
+        private ProfileSelector _profileSelector;
+        private string _profileName;
 
         string[] archiveExtensions = { ".7z", ".zip", ".rar", ".tar", ".gz", ".bz2", ".xz", ".cab", ".iso" };
 
@@ -32,20 +35,23 @@ namespace SevenZipSharpArchiver.Core
         /// </summary>
         /// <param name="inputFile">Input file path</param>
         /// <param name="outputFile">Output file path</param>
-        public ArchiverManager(string inputFile, string outputFile)
-            : this(new List<string> { inputFile }, outputFile) { }
+        /// <param name="profileName">Optional compression profile name</param>
+        public ArchiverManager(string inputFile, string outputFile, string profileName = null)
+            : this(new List<string> { inputFile }, outputFile, profileName) { }
 
         /// <summary>
         /// Creates a new archiver manager for multiple file operations
         /// </summary>
         /// <param name="inputFiles">List of input file paths</param>
         /// <param name="outputPath">Output file or directory path</param>
-        public ArchiverManager(IEnumerable<string> inputFiles, string outputPath)
+        /// <param name="profileName">Optional compression profile name</param>
+        public ArchiverManager(IEnumerable<string> inputFiles, string outputPath, string profileName = null)
         {
             _settings = new PPMdSettings();
             _decompressionSettings = new DecompressionSettings();
             _inputFilePaths = inputFiles?.ToList() ?? throw new ArgumentNullException(nameof(inputFiles));
             _outputPath = outputPath ?? throw new ArgumentNullException(nameof(outputPath));
+            _profileName = profileName;
             _settingsMapper = new PPMdSettingsMapper();
             
             // Initialize logger
@@ -54,11 +60,12 @@ namespace SevenZipSharpArchiver.Core
             string logFilePath = Path.Combine(logDirectory, logFileName);
             _logger = new FileLogger("ArchiverManager", logFilePath);
             
-            // Initialize factories
+            // Initialize factories and profile selector
             _compressorFactory = new DefaultCompressorFactory();
             _decompressorFactory = new DefaultDecompressorFactory();
+            _profileSelector = new ProfileSelector(_logger);
             
-            _logger.Information($"ArchiverManager initialized. Input files: {_inputFilePaths.Count}, Output: {outputPath}");
+            _logger.Information($"ArchiverManager initialized. Input files: {_inputFilePaths.Count}, Output: {outputPath}, Profile: {_profileName ?? "auto"}");
         }
 
         public void Init()
@@ -80,7 +87,7 @@ namespace SevenZipSharpArchiver.Core
                 _logger.Debug("Initializing 7z library...");
                 BaseLibraryLoader.InitializeLibrary();
 
-                // For single file operations, check if we're decompressing or compressing
+                // For single file
                 if (_inputFilePaths.Count == 1)
                 {
                     string fileExtension = Path.GetExtension(_inputFilePaths[0]).ToLower();
@@ -99,7 +106,7 @@ namespace SevenZipSharpArchiver.Core
                         Compression();
                     }
                 }
-                // For multiple files, always compress
+                // For multiple files
                 else
                 {
                     _logger.Information($"Processing {_inputFilePaths.Count} files for compression");
@@ -115,44 +122,13 @@ namespace SevenZipSharpArchiver.Core
             }
         }
 
-        /// <summary>
-        /// Extracts specific files from an archive
-        /// </summary>
-        /// <param name="fileNamesToExtract">List of file names to extract from the archive</param>
-        public void ExtractSpecificFiles(IEnumerable<string> fileNamesToExtract)
-        {
-            if (_inputFilePaths.Count != 1)
-            {
-                _logger.Error("Multiple input archives not supported for selective extraction");
-                throw new InvalidOperationException("Multiple input archives not supported for selective extraction");
-            }
-
-            string inputArchive = _inputFilePaths[0];
-            string fileExtension = Path.GetExtension(inputArchive).ToLower();
-
-            if (!archiveExtensions.Contains(fileExtension))
-            {
-                _logger.Error($"The file {inputArchive} is not a recognized archive format");
-                throw new InvalidOperationException($"The file {inputArchive} is not a recognized archive format");
-            }
-
-            _logger.Information($"Extracting specific files from {inputArchive}");
-            
-            var decompressor = new Decompressor(_decompressionSettings, _logger, _decompressorFactory);
-            try
-            {
-                decompressor.ExtractFiles(inputArchive, fileNamesToExtract, _outputPath);
-                _logger.Information("Extraction of specific files completed");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Error extracting specific files", ex);
-                throw;
-            }
-        }
-
         public void Compression()
         {
+            // Apply profile to settings based on input file and/or specified profile
+            string primaryFile = _inputFilePaths.First();
+            _logger.Debug($"Applying compression profile based on file: {primaryFile}");
+            _settings = _profileSelector.SelectAndApplyProfile(_settings, primaryFile, _profileName);
+            
             _logger.Debug("Mapping compression settings to parameters...");
             var compressionParams = _settingsMapper.MapToParameters(_settings);
             var compressor = new Compressor(compressionParams, _settings, _logger, _compressorFactory);

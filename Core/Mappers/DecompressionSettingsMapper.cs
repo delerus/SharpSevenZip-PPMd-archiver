@@ -21,8 +21,8 @@ namespace SevenZipSharpArchiver.Core.Mappers
 
             var parameters = new Dictionary<string, string>();
 
-            // Currently no additional parameters are needed for SharpSevenZipExtractor
-            // but we're creating this mapper for future extensibility
+            // Currently no additional parameters
+            // used to future extensibility
             
             return parameters;
         }
