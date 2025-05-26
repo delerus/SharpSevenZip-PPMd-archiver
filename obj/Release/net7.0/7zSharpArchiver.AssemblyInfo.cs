@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3e43e6dfa4ad9fafd1e29f6248701a74dd47ce40")]
 [assembly: System.Reflection.AssemblyProductAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("7zSharpArchiver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
