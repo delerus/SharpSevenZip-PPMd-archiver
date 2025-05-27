@@ -36,15 +36,16 @@ namespace SevenZipSharpArchiver
                 // Create logger
                 var logger = CreateConsoleLogger();
                 
-                // Create archiver manager with DI
-                var archiver = new ArchiverManager(
-                    inputFiles, 
-                    outputPath, 
-                    profileName,
-                    logger);
+                // Create archiver manager using builder
+                var archiver = new ArchiverManagerBuilder()
+                    .WithInputFiles(inputFiles)
+                    .WithOutputPath(outputPath)
+                    .WithProfile(profileName)
+                    .WithLoggerFactory(new DefaultLoggerFactory())
+                    .Build();
                 
                 // Execute operation
-                archiver.Init();
+                archiver.Execute();
                 
                 Console.WriteLine("Operation completed successfully.");
             }
