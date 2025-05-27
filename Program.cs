@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SharpSevenZip;
 using SevenZipSharpArchiver.Core;
-using SevenZipSharpArchiver.Core.Profiling;
+using SevenZipSharpArchiver.Core.Logging;
+using SevenZipSharpArchiver.Core.Operations;
 
 namespace SevenZipSharpArchiver
 {
@@ -22,32 +22,7 @@ namespace SevenZipSharpArchiver
             try
             {
                 // Parse command line arguments
-                string profileName = null;
-                List<string> inputFiles = new List<string>();
-                string outputPath = null;
-                
-                for (int i = 0; i < args.Length; i++)
-                {
-                    string arg = args[i];
-                    
-                    // Check for profile flag
-                    if (arg.StartsWith("--profile=", StringComparison.OrdinalIgnoreCase))
-                    {
-                        profileName = arg.Substring("--profile=".Length);
-                        Console.WriteLine($"Using compression profile: {profileName}");
-                        continue;
-                    }
-                    
-                    // If it's the last argument and we haven't set outputPath
-                    if (i == args.Length - 1 && outputPath == null)
-                    {
-                        outputPath = arg;
-                    }
-                    else
-                    {
-                        inputFiles.Add(arg);
-                    }
-                }
+                var (profileName, inputFiles, outputPath) = ParseCommandLineArgs(args);
                 
                 if (inputFiles.Count == 0 || outputPath == null)
                 {
@@ -58,7 +33,17 @@ namespace SevenZipSharpArchiver
                 
                 Console.WriteLine($"Processing {inputFiles.Count} input file(s)");
                 
-                var archiver = new ArchiverManager(inputFiles, outputPath, profileName);
+                // Create logger
+                var logger = CreateConsoleLogger();
+                
+                // Create archiver manager with DI
+                var archiver = new ArchiverManager(
+                    inputFiles, 
+                    outputPath, 
+                    profileName,
+                    logger);
+                
+                // Execute operation
                 archiver.Init();
                 
                 Console.WriteLine("Operation completed successfully.");
@@ -70,6 +55,54 @@ namespace SevenZipSharpArchiver
             
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+        }
+        
+        /// <summary>
+        /// Parses command line arguments
+        /// </summary>
+        static (string profileName, List<string> inputFiles, string outputPath) ParseCommandLineArgs(string[] args)
+        {
+            string profileName = null;
+            List<string> inputFiles = new List<string>();
+            string outputPath = null;
+            
+            for (int i = 0; i < args.Length; i++)
+            {
+                string arg = args[i];
+                
+                // Check for profile flag
+                if (arg.StartsWith("--profile=", StringComparison.OrdinalIgnoreCase))
+                {
+                    profileName = arg.Substring("--profile=".Length);
+                    Console.WriteLine($"Using compression profile: {profileName}");
+                    continue;
+                }
+                
+                // If it's the last argument and we haven't set outputPath
+                if (i == args.Length - 1 && outputPath == null)
+                {
+                    outputPath = arg;
+                }
+                else
+                {
+                    inputFiles.Add(arg);
+                }
+            }
+            
+            return (profileName, inputFiles, outputPath);
+        }
+        
+        /// <summary>
+        /// Creates a console logger
+        /// </summary>
+        static ILogger CreateConsoleLogger()
+        {
+            // For simplicity, we're using a file logger that also logs to console
+            string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+            Directory.CreateDirectory(logDirectory);
+            string logFileName = $"archiver_{DateTime.Now:yyyyMMdd_HHmmss}.log";
+            string logFilePath = Path.Combine(logDirectory, logFileName);
+            return new FileLogger("ArchiverManager", logFilePath);
         }
         
         static void ShowUsage()
