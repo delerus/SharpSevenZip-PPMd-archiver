@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.IO;
 using SevenZipSharpArchiver.Core;
 using SevenZipSharpArchiver.Core.Logging;
 using SevenZipSharpArchiver.Core.Operations;
@@ -14,6 +15,7 @@ namespace SevenZipSharpArchiver.Api
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
+        private readonly IOperationDetector _operationDetector;
         
         /// <summary>
         /// Creates a new instance of ArchiveApi with default logging
@@ -31,6 +33,62 @@ namespace SevenZipSharpArchiver.Api
         {
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = _loggerFactory.CreateLogger(nameof(ArchiveApi));
+            _operationDetector = new DefaultOperationDetector(_logger);
+        }
+        
+        /// <summary>
+        /// Automatically determines operation type and processes files accordingly
+        /// </summary>
+        /// <param name="inputFiles">Input files to process</param>
+        /// <param name="outputPath">Output path (file or directory)</param>
+        /// <param name="profileName">Optional compression profile name</param>
+        /// <returns>Result of the operation</returns>
+        public ArchiveResult ProcessAutomatic(IEnumerable<string> inputFiles, string outputPath, string profileName = null)
+        {
+            try
+            {
+                _logger.Information($"API: Auto-detecting operation for {outputPath}");
+                
+                // Detect operation type
+                var operationType = _operationDetector.DetectOperation(inputFiles, outputPath);
+                
+                // Process based on detected operation type
+                if (operationType == OperationType.Decompress)
+                {
+                    _logger.Information($"API: Detected decompression operation");
+                    
+                    // For decompression, we should have only one input file
+                    var inputFile = inputFiles.First();
+                    return DecompressArchive(inputFile, outputPath);
+                }
+                else
+                {
+                    _logger.Information($"API: Detected compression operation");
+                    return CompressFiles(inputFiles, outputPath, profileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("API: Auto-detection processing failed", ex);
+                return new ArchiveResult
+                {
+                    Success = false,
+                    Message = $"Operation failed: {ex.Message}",
+                    Exception = ex
+                };
+            }
+        }
+        
+        /// <summary>
+        /// Asynchronously processes files with automatic operation detection
+        /// </summary>
+        /// <param name="inputFiles">Input files to process</param>
+        /// <param name="outputPath">Output path (file or directory)</param>
+        /// <param name="profileName">Optional compression profile name</param>
+        /// <returns>Result of the operation</returns>
+        public Task<ArchiveResult> ProcessAutomaticAsync(IEnumerable<string> inputFiles, string outputPath, string profileName = null)
+        {
+            return Task.Run(() => ProcessAutomatic(inputFiles, outputPath, profileName));
         }
         
         /// <summary>

@@ -126,5 +126,80 @@ namespace SevenZipSharpArchiver.Api.Examples
                 Console.WriteLine($"Compression failed: {result.Message}");
             }
         }
+        
+        /// <summary>
+        /// Shows how to use automatic operation detection
+        /// </summary>
+        public static void AutomaticOperationExample()
+        {
+            // Create API instance
+            var api = new ArchiveApi();
+            
+            // Example 1: Compression (detected by output file extension)
+            Console.WriteLine("Example 1: Automatic compression");
+            var inputFiles = new List<string>
+            {
+                @"C:\temp\file1.txt",
+                @"C:\temp\file2.txt"
+            };
+            string outputArchive = @"C:\temp\auto_detected.7z";
+            
+            ArchiveResult compressionResult = api.ProcessAutomatic(inputFiles, outputArchive);
+            
+            if (compressionResult.Success)
+            {
+                Console.WriteLine($"Automatic compression succeeded: {outputArchive}");
+            }
+            else
+            {
+                Console.WriteLine($"Automatic compression failed: {compressionResult.Message}");
+            }
+            
+            // Example 2: Decompression (detected by input file being an archive)
+            Console.WriteLine("\nExample 2: Automatic decompression");
+            var archiveFile = new List<string> { @"C:\temp\archive_to_extract.7z" };
+            string extractPath = @"C:\temp\auto_extracted";
+            
+            // Ensure extract directory exists
+            Directory.CreateDirectory(extractPath);
+            
+            ArchiveResult decompressionResult = api.ProcessAutomatic(archiveFile, extractPath);
+            
+            if (decompressionResult.Success)
+            {
+                Console.WriteLine($"Automatic decompression succeeded: {extractPath}");
+            }
+            else
+            {
+                Console.WriteLine($"Automatic decompression failed: {decompressionResult.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// Shows how to use automatic operation detection asynchronously
+        /// </summary>
+        public static async Task AutomaticOperationAsyncExample()
+        {
+            // Create API instance
+            var api = new ArchiveApi();
+            
+            // Define input files and output path
+            var inputFiles = new List<string> { @"C:\temp\large_log_file.txt" };
+            string outputFile = @"C:\temp\auto_detected_async.7z";
+            
+            Console.WriteLine("Starting automatic operation (async)...");
+            
+            // Let the API automatically detect and execute the appropriate operation
+            ArchiveResult result = await api.ProcessAutomaticAsync(inputFiles, outputFile);
+            
+            if (result.Success)
+            {
+                Console.WriteLine($"Automatic operation completed successfully");
+            }
+            else
+            {
+                Console.WriteLine($"Automatic operation failed: {result.Message}");
+            }
+        }
     }
 } 
