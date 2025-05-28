@@ -2,60 +2,53 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SevenZipSharpArchiver.Core;
-using SevenZipSharpArchiver.Core.Logging;
-using SevenZipSharpArchiver.Core.Operations;
+using System.Threading.Tasks;
+using SevenZipSharpArchiver.Api;
 
 namespace SevenZipSharpArchiver
 {
-    class PPMdArchiver
+    class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            if (args.Length < 2)
-            {
-                ShowUsage();
-                Console.ReadKey();
-                return;
-            }
-
             try
             {
+                if (args.Length < 2)
+                {
+                    ShowUsage();
+                    return;
+                }
+
                 // Parse command line arguments
                 var (profileName, inputFiles, outputPath) = ParseCommandLineArgs(args);
                 
                 if (inputFiles.Count == 0 || outputPath == null)
                 {
                     ShowUsage();
-                    Console.ReadKey();
                     return;
                 }
                 
                 Console.WriteLine($"Processing {inputFiles.Count} input file(s)");
                 
-                // Create logger
-                var logger = CreateConsoleLogger();
+                // Create API instance
+                var api = new ArchiveApi();
                 
-                // Create archiver manager using builder
-                var archiver = new ArchiverManagerBuilder()
-                    .WithInputFiles(inputFiles)
-                    .WithOutputPath(outputPath)
-                    .WithProfile(profileName)
-                    .WithLoggerFactory(new DefaultLoggerFactory())
-                    .Build();
+                // Use automatic operation detection and processing
+                var result = await api.ProcessAutomaticAsync(inputFiles, outputPath, profileName);
                 
-                // Execute operation
-                archiver.Execute();
-                
-                Console.WriteLine("Operation completed successfully.");
+                if (result.Success)
+                {
+                    Console.WriteLine("Operation completed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine($"Error: {result.Message}");
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-            
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
         }
         
         /// <summary>
@@ -79,7 +72,6 @@ namespace SevenZipSharpArchiver
                     continue;
                 }
                 
-                // If it's the last argument and we haven't set outputPath
                 if (i == args.Length - 1 && outputPath == null)
                 {
                     outputPath = arg;
@@ -93,22 +85,9 @@ namespace SevenZipSharpArchiver
             return (profileName, inputFiles, outputPath);
         }
         
-        /// <summary>
-        /// Creates a console logger
-        /// </summary>
-        static ILogger CreateConsoleLogger()
-        {
-            // For simplicity, we're using a file logger that also logs to console
-            string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-            Directory.CreateDirectory(logDirectory);
-            string logFileName = $"archiver_{DateTime.Now:yyyyMMdd_HHmmss}.log";
-            string logFilePath = Path.Combine(logDirectory, logFileName);
-            return new FileLogger("ArchiverManager", logFilePath);
-        }
-        
         static void ShowUsage()
         {
-            Console.WriteLine("7zSharpArchiver - PPMd Archiver using SharpSevenZip");
+            Console.WriteLine("7zSharpArchiver - PPMd Archiver using SharpSevenZip API");
             Console.WriteLine();
             Console.WriteLine("Usage:");
             Console.WriteLine("  Compression (single file):");
