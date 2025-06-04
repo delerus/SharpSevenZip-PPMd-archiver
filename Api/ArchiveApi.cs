@@ -57,9 +57,18 @@ namespace SevenZipSharpArchiver.Api
                 {
                     _logger.Information($"API: Detected decompression operation");
                     
-                    // For decompression, we should have only one input file
-                    var inputFile = inputFiles.First();
-                    return DecompressArchive(inputFile, outputPath);
+                    // Check if we have multiple archives
+                    var inputFilesList = inputFiles.ToList();
+                    if (inputFilesList.Count > 1)
+                    {
+                        return DecompressArchives(inputFilesList, outputPath);
+                    }
+                    else
+                    {
+                        // For single archive decompression
+                        var inputFile = inputFilesList.First();
+                        return DecompressArchive(inputFile, outputPath);
+                    }
                 }
                 else
                 {
@@ -210,6 +219,44 @@ namespace SevenZipSharpArchiver.Api
         }
         
         /// <summary>
+        /// Decompresses multiple archives to a directory
+        /// </summary>
+        /// <param name="archiveFiles">Paths to the archive files</param>
+        /// <param name="outputDirectory">Path to the output directory</param>
+        /// <returns>Result of the operation</returns>
+        public ArchiveResult DecompressArchives(IEnumerable<string> archiveFiles, string outputDirectory)
+        {
+            try
+            {
+                _logger.Information($"API: Decompressing {archiveFiles.Count()} archives to {outputDirectory}");
+                
+                var archiver = new ArchiverManagerBuilder()
+                    .WithInputFiles(archiveFiles)
+                    .WithOutputPath(outputDirectory)
+                    .WithLoggerFactory(_loggerFactory)
+                    .Build();
+                
+                archiver.Execute();
+                
+                return new ArchiveResult
+                {
+                    Success = true,
+                    Message = "All archives decompressed successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("API: Multiple decompression failed", ex);
+                return new ArchiveResult
+                {
+                    Success = false,
+                    Message = $"Decompression failed: {ex.Message}",
+                    Exception = ex
+                };
+            }
+        }
+        
+        /// <summary>
         /// Asynchronously compresses a single file to an archive
         /// </summary>
         /// <param name="inputFile">Path to the input file</param>
@@ -242,6 +289,17 @@ namespace SevenZipSharpArchiver.Api
         public Task<ArchiveResult> DecompressArchiveAsync(string archiveFile, string outputDirectory)
         {
             return Task.Run(() => DecompressArchive(archiveFile, outputDirectory));
+        }
+        
+        /// <summary>
+        /// Asynchronously decompresses multiple archives to a directory
+        /// </summary>
+        /// <param name="archiveFiles">Paths to the archive files</param>
+        /// <param name="outputDirectory">Path to the output directory</param>
+        /// <returns>Result of the operation</returns>
+        public Task<ArchiveResult> DecompressArchivesAsync(IEnumerable<string> archiveFiles, string outputDirectory)
+        {
+            return Task.Run(() => DecompressArchives(archiveFiles, outputDirectory));
         }
     }
 } 

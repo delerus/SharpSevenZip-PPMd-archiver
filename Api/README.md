@@ -7,6 +7,8 @@ This module provides a programming interface (API) for integrating archiving and
 - Compression of a single file into an archive
 - Compression of multiple files into an archive
 - Extraction of an archive to a specified directory
+- Extraction of multiple archives simultaneously
+- Automatic operation detection (compression or decompression)
 - Synchronous and asynchronous operations
 - Error handling and detailed operation results
 
@@ -21,6 +23,36 @@ var api = new ArchiveApi();
 // Or with a custom logger factory
 var loggerFactory = new DefaultLoggerFactory("path/to/logs");
 var api = new ArchiveApi(loggerFactory);
+```
+
+### Automatic Operation Detection
+
+```csharp
+// Let the API automatically determine if compression or decompression is needed
+var inputFiles = new List<string> { @"C:\temp\document.txt" };
+string outputPath = @"C:\temp\document.7z";
+
+// Synchronous operation
+ArchiveResult result = api.ProcessAutomatic(inputFiles, outputPath);
+
+// Asynchronous operation
+ArchiveResult result = await api.ProcessAutomaticAsync(inputFiles, outputPath);
+
+if (result.Success)
+{
+    Console.WriteLine("Operation completed successfully");
+}
+else
+{
+    Console.WriteLine($"Operation error: {result.Message}");
+}
+
+// Automatic decompression example
+var archiveFile = new List<string> { @"C:\temp\archive.7z" };
+string extractPath = @"C:\temp\extracted";
+Directory.CreateDirectory(extractPath);
+
+result = api.ProcessAutomatic(archiveFile, extractPath);
 ```
 
 ### Compressing a Single File
@@ -85,6 +117,38 @@ if (result.Success)
 }
 ```
 
+### Extracting Multiple Archives
+
+```csharp
+var archiveFiles = new List<string>
+{
+    @"C:\temp\archive1.7z",
+    @"C:\temp\archive2.zip",
+    @"C:\temp\archive3.rar"
+};
+string outputDirectory = @"C:\temp\extracted_multiple";
+
+// Create directory if it doesn't exist
+Directory.CreateDirectory(outputDirectory);
+
+// Synchronous operation
+ArchiveResult result = api.DecompressArchives(archiveFiles, outputDirectory);
+
+// Asynchronous operation
+ArchiveResult result = await api.DecompressArchivesAsync(archiveFiles, outputDirectory);
+
+if (result.Success)
+{
+    Console.WriteLine("All archives extracted successfully");
+}
+else
+{
+    Console.WriteLine($"Extraction error: {result.Message}");
+}
+```
+
+When extracting multiple archives, each archive is extracted to its own subdirectory named after the archive file (without extension) inside the output directory.
+
 ## Modularity and Extensibility
 
 The API is designed with modularity and extensibility in mind, following SOLID principles:
@@ -96,6 +160,18 @@ The API supports dependency injection through its constructor:
 ```csharp
 // Create with custom dependencies
 var api = new ArchiveApi(customLoggerFactory);
+```
+
+### Operation Detection
+
+The API includes an operation detection mechanism that automatically determines whether to compress or decompress based on input files and output path:
+
+```csharp
+// The API uses DefaultOperationDetector internally
+var operationDetector = new DefaultOperationDetector(logger);
+var operationType = operationDetector.DetectOperation(inputFiles, outputPath);
+
+// This is used by the ProcessAutomatic method
 ```
 
 ### Integration with Core Architecture
@@ -197,4 +273,10 @@ public class ArchiveFileResult : ArchiveResult
 
 ## Usage Examples
 
-See the `ApiExample` class for complete examples of using the API. 
+See the `ApiExample` class for complete examples of using the API, including:
+
+- Compressing a single file
+- Compressing multiple files
+- Decompressing an archive
+- Using asynchronous operations
+- Using automatic operation detection 

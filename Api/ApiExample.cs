@@ -201,5 +201,79 @@ namespace SevenZipSharpArchiver.Api.Examples
                 Console.WriteLine($"Automatic operation failed: {result.Message}");
             }
         }
+        
+        /// <summary>
+        /// Shows how to use the API to decompress multiple archives at once
+        /// </summary>
+        public static void DecompressMultipleArchivesExample()
+        {
+            // Create API instance
+            var api = new ArchiveApi();
+            
+            // Define input archives and output directory
+            var archiveFiles = new List<string>
+            {
+                @"C:\temp\archive1.7z",
+                @"C:\temp\archive2.zip",
+                @"C:\temp\archive3.rar"
+            };
+            string outputDirectory = @"C:\temp\extracted_multiple";
+            
+            // Create output directory if it doesn't exist
+            Directory.CreateDirectory(outputDirectory);
+            
+            // Decompress the archives
+            Console.WriteLine($"Decompressing {archiveFiles.Count} archives...");
+            ArchiveResult result = api.DecompressArchives(archiveFiles, outputDirectory);
+            
+            // Check the result
+            if (result.Success)
+            {
+                Console.WriteLine($"All archives decompressed successfully to: {outputDirectory}");
+                Console.WriteLine("Each archive was extracted to its own subdirectory.");
+            }
+            else
+            {
+                Console.WriteLine($"Decompression failed: {result.Message}");
+                if (result.Exception != null)
+                {
+                    Console.WriteLine($"Exception: {result.Exception.Message}");
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Shows how to use automatic operation detection with multiple archives
+        /// </summary>
+        public static void AutomaticMultipleArchivesExample()
+        {
+            // Create API instance
+            var api = new ArchiveApi();
+            
+            // Define input archives and output directory
+            var archiveFiles = new List<string>
+            {
+                @"C:\temp\archive1.7z",
+                @"C:\temp\archive2.zip"
+            };
+            string outputDirectory = @"C:\temp\auto_extracted_multiple";
+            
+            // Create output directory if it doesn't exist
+            Directory.CreateDirectory(outputDirectory);
+            
+            // Let the API automatically detect and execute the appropriate operation
+            Console.WriteLine($"Processing {archiveFiles.Count} archives automatically...");
+            ArchiveResult result = api.ProcessAutomatic(archiveFiles, outputDirectory);
+            
+            // Check the result
+            if (result.Success)
+            {
+                Console.WriteLine($"All archives processed successfully to: {outputDirectory}");
+            }
+            else
+            {
+                Console.WriteLine($"Processing failed: {result.Message}");
+            }
+        }
     }
 } 
