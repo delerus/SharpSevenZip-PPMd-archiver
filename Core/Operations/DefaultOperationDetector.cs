@@ -33,10 +33,14 @@ namespace SevenZipSharpArchiver.Core.Operations
                 throw new System.ArgumentException("No input files specified");
             }
             
-            // If we have a single input file and it's an archive, we're decompressing
-            if (inputFiles.Count() == 1 && IsArchive(inputFiles.First()))
+            // Check if all input files are archives
+            bool allFilesAreArchives = inputFiles.All(IsArchive);
+            
+            // If all input files are archives, we're decompressing
+            if (allFilesAreArchives)
             {
-                _logger?.Information($"Detected decompression operation for {inputFiles.First()}");
+                int archiveCount = inputFiles.Count();
+                _logger?.Information($"Detected decompression operation for {archiveCount} archive(s)");
                 return OperationType.Decompress;
             }
             
