@@ -8,17 +8,37 @@ namespace SevenZipSharpArchiver.Core.Models
     /// </summary>
     public class PPMdSettings
     {
+        private int _modelOrder = 10;
         /// <summary>
         /// PPMd model order (context length)
         /// Valid range: 2-16
         /// </summary>
-        public int ModelOrder { get; set; } = 10;
+        public int ModelOrder
+        {
+            get => _modelOrder;
+            set
+            {
+                if (value < 1 || value > 16)
+                    throw new ArgumentOutOfRangeException(nameof(ModelOrder), "ModelOrder must be between 1 and 16.");
+                _modelOrder = value;
+            }
+        }
 
+        private int _memorySizeMB = 2048;
         /// <summary>
         /// Memory usage limit in MB
         /// Valid range: 1-2048
         /// </summary>
-        public int MemorySizeMB { get; set; } = 2048;
+        public int MemorySizeMB
+        {
+            get => _memorySizeMB;
+            set
+            {
+                if (value < 1 || value > 2048)
+                    throw new ArgumentOutOfRangeException(nameof(MemorySizeMB), "MemorySizeMB must be between 1 and 2048.");
+                _memorySizeMB = value;
+            }
+        }
 
         /// <summary>
         /// Archive format to use
