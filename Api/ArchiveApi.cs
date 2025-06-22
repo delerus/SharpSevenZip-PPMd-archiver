@@ -49,8 +49,11 @@ namespace SevenZipSharpArchiver.Api
             {
                 _logger.Information($"API: Auto-detecting operation for {outputPath}");
                 
+                // Convert to list once to avoid multiple enumerations
+                var inputFilesList = inputFiles.ToList();
+                
                 // Detect operation type
-                var operationType = _operationDetector.DetectOperation(inputFiles, outputPath);
+                var operationType = _operationDetector.DetectOperation(inputFilesList, outputPath);
                 
                 // Process based on detected operation type
                 if (operationType == OperationType.Decompress)
@@ -58,7 +61,6 @@ namespace SevenZipSharpArchiver.Api
                     _logger.Information($"API: Detected decompression operation");
                     
                     // Check if we have multiple archives
-                    var inputFilesList = inputFiles.ToList();
                     if (inputFilesList.Count > 1)
                     {
                         return DecompressArchives(inputFilesList, outputPath);
@@ -73,7 +75,15 @@ namespace SevenZipSharpArchiver.Api
                 else
                 {
                     _logger.Information($"API: Detected compression operation");
-                    return CompressFiles(inputFiles, outputPath, profileName);
+                    
+                    if (inputFilesList.Count == 1)
+                    {
+                        return CompressFile(inputFilesList.First(), outputPath, profileName);
+                    }
+                    else
+                    {
+                        return CompressFiles(inputFilesList, outputPath, profileName);
+                    }
                 }
             }
             catch (Exception ex)
@@ -120,7 +130,7 @@ namespace SevenZipSharpArchiver.Api
                     .WithLoggerFactory(_loggerFactory)
                     .Build();
                 
-                archiver.Execute();
+                archiver.ExecuteOperation(OperationType.Compress);
                 
                 return new ArchiveResult
                 {
@@ -151,21 +161,31 @@ namespace SevenZipSharpArchiver.Api
         {
             try
             {
-                _logger.Information($"API: Compressing multiple files to {outputFile}");
+                var filesList = inputFiles.ToList();
+                int fileCount = filesList.Count;
+                
+                if (fileCount == 1)
+                {
+                    _logger.Information($"API: Compressing single file to {outputFile}");
+                }
+                else
+                {
+                    _logger.Information($"API: Compressing {fileCount} files to {outputFile}");
+                }
                 
                 var archiver = new ArchiverManagerBuilder()
-                    .WithInputFiles(inputFiles)
+                    .WithInputFiles(filesList)
                     .WithOutputPath(outputFile)
                     .WithProfile(profileName)
                     .WithLoggerFactory(_loggerFactory)
                     .Build();
                 
-                archiver.Execute();
+                archiver.ExecuteOperation(OperationType.Compress);
                 
                 return new ArchiveResult
                 {
                     Success = true,
-                    Message = "Files compressed successfully"
+                    Message = fileCount == 1 ? "File compressed successfully" : "Files compressed successfully"
                 };
             }
             catch (Exception ex)
@@ -198,7 +218,7 @@ namespace SevenZipSharpArchiver.Api
                     .WithLoggerFactory(_loggerFactory)
                     .Build();
                 
-                archiver.Execute();
+                archiver.ExecuteOperation(OperationType.Decompress);
                 
                 return new ArchiveResult
                 {
@@ -236,7 +256,7 @@ namespace SevenZipSharpArchiver.Api
                     .WithLoggerFactory(_loggerFactory)
                     .Build();
                 
-                archiver.Execute();
+                archiver.ExecuteOperation(OperationType.Decompress);
                 
                 return new ArchiveResult
                 {
