@@ -79,8 +79,8 @@ namespace SevenZipSharpArchiver.Core.Profiling
         {
             return new PPMdSettings
             {
-                ModelOrder = 6,               // Small context for simple data
-                MemorySizeMB = 128,           // Less memory for simple data
+                ModelOrder = 5,               // Small context for simple data
+                MemorySizeMB = 64,            // Less memory for simple data
                 CompressionLevel = CompressionLevel.Fast,
                 FastCompression = true
             };
@@ -93,22 +93,22 @@ namespace SevenZipSharpArchiver.Core.Profiling
         {
             return new PPMdSettings
             {
-                ModelOrder = 10,              // Medium context for regular text
-                MemorySizeMB = 1024,          // Moderate amount of memory
+                ModelOrder = 7,               // Optimized context for text documents
+                MemorySizeMB = 256,           // Optimized memory usage for text
                 CompressionLevel = CompressionLevel.Normal,
                 FastCompression = false
             };
         }
 
         /// <summary>
-        /// Settings for Extreme profile (maximum compression)
+        /// Settings for Extreme profile (using text profile settings as requested)
         /// </summary>
         private static PPMdSettings GetExtremeProfileSettings()
         {
             return new PPMdSettings
             {
-                ModelOrder = 16,              // Large context for maximum compression
-                MemorySizeMB = 2048,          // Large amount of memory
+                ModelOrder = 10,              // Using previous text profile settings
+                MemorySizeMB = 1024,          // Using previous text profile settings
                 CompressionLevel = CompressionLevel.Ultra,
                 FastCompression = false
             };
