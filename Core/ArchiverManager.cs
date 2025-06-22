@@ -134,7 +134,7 @@ namespace SevenZipSharpArchiver.Core
         /// Creates and executes the appropriate operation
         /// </summary>
         /// <param name="operationType">Type of operation to execute</param>
-        private void ExecuteOperation(OperationType operationType)
+        public void ExecuteOperation(OperationType operationType)
         {
             _logger.Debug($"Creating {operationType} operation");
             IOperation operation = _operationFactory.CreateOperation(operationType, _profileName);
