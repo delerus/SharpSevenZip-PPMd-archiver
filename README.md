@@ -1,8 +1,44 @@
-# 7zSharpArchiver API
+# SharpSevenZip Archiver
+
+SharpSevenZip Archiver is a modular and extensible 7‑Zip–based archiver designed for highly efficient text compression. It leverages the PPMd algorithm, which offers superior performance on text data.
+
+The archiver uses the [SharpSevenZip by Jeremy Ansel](https://github.com/JeremyAnsel/SharpSevenZip) library — a wrapper around the native 7‑Zip dll library.
+
+## Key Features
+
+- **CLI application** with an command‑line interface.  
+- **Fluent API** for seamless integration into other .NET projects.  
+- **Profile system** with automatic profile selection based on file type.  
+- **Three optimized profiles** tailored to different text‑compression scenarios.  
+- **Automatic operation detection** driven by file extensions.  
+- **Mappers and models** to facilitate use with additional libraries.  
+
+In addition to compression, extraction from any archive format supported by 7‑Zip is fully supported.
+
+## Compression Profiles
+
+- `text` — optimized for typical text files  
+- `logs` — optimized for log files and structured data  
+- `extreme` — maximum compression ratio (slowest mode)  
+
+If no profile is specified, the archiver selects the most suitable one automatically based on the file extension.
+
+## Program Structure
+
+![Diagram](Diagram.png)
+
+The project is organized into two layers:
+
+1. **API Layer**  
+   - Provides a façade (`ArchiverApi`) and data models for compression operations.  
+2.  **Core Layer**  
+    - Contains archiver manager (`ArchiverManager.cs`) to control work of all core modules.
+
+# Archiver API documentation
 
 This module provides a programming interface (API) for integrating archiving and extraction functionality into other applications.
 
-## Key Features
+## Key API Features
 
 - Compression of a single file into an archive
 - Compression of multiple files into an archive
@@ -235,16 +271,6 @@ public class CustomLoggerFactory : ILoggerFactory
 // Then use it with the API
 var api = new ArchiveApi(new CustomLoggerFactory());
 ```
-
-## Compression Profiles
-
-The API supports the following built-in compression profiles:
-
-- `text` - optimized for regular text files
-- `logs` - optimized for logs and structured data
-- `extreme` - maximum compression (slower)
-
-If no profile is specified, it will be automatically selected based on the file type.
 
 ## Handling Results
 
